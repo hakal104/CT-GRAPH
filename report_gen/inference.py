@@ -118,7 +118,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Generate reports.")
     parser.add_argument("--model_path", type=str, default=None, help="Path to model weights.")
-    parser.add_argument("--batch_size", type=int, default=14, help="Batch size.")
+    parser.add_argument("--batch_size", type=int, default=16, help="Batch size.")
 
     args = parser.parse_args()
 

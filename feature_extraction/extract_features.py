@@ -37,7 +37,7 @@ class MaskFeaturesDataset(Dataset):
         dictionary with 'image', 'ana', and 'paths'.
     """
     
-    def __init__(self, ct_paths, ana_paths, arch, transform):
+    def __init__(self, ct_paths, ana_paths, arch, transform, use_s3):
         
         self.ct_paths = ct_paths
         self.ana_paths = ana_paths
@@ -209,24 +209,27 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Extract features from CT images via pretrained 3D SSL models.")
     parser.add_argument("--weight_path", type=str, default=None, help="Path to model weights.")
-    parser.add_argument("--ctrate_reports_path", type=str, default=None, help="Path to dataframe/reports from CT-RATE.")
+    parser.add_argument("--ctrate_dir", type=str, default=None, help="Path to CT-RATE directory.")
     parser.add_argument("--arch", type=str, default=None, help="Type of feature extractor.")
     parser.add_argument("--arch_size", type=str, default='B', help="Size of architecture.")
     parser.add_argument("--mode", type=str, default="", help="Training or validation features.")
     parser.add_argument("--batch_size", type=int, default=4, help="Batch size.")
     parser.add_argument("--use_s3", type=bool, default=False, help="Whether to use S3 storage.")
-    parser.add_argument("--save_dir", type=str, default="", help="Path to directory to save features.")
     
     args = parser.parse_args()
 
     client=get_client()
-    reports_df = pd.read_csv(args.ctrate_reports_path).drop_duplicates('Findings_EN')
+    reports_df = pd.read_csv(os.path.join(args.ctrate_dir, 'train_reports.csv')).drop_duplicates('Findings_EN')
     names = list(reports_df['VolumeName'])   
 
     ct_paths = [f'dataset/{args.mode}/{name[:-11]}/{name[:-9]}/{name}'.replace('.nii.gz','.npy') for name in names]
     ana_paths = [f'dataset/{args.mode}/{name[:-11]}/{name[:-9]}/ana_{name}'.replace('.nii.gz','.npy') for name in names]
 
+    if not args.use_s3:
+        ct_paths = [os.path.join(args.ctrate_dir,path) for path in ct_paths]
+        ana_paths = [os.path.join(args.ctrate_dir,path) for path in ana_paths]
+        
     is_voco = 'voco' in args.arch
     model,transforms,_,roi = get_models(arch=args.arch, weight_path =args.weight_path, is_voco=is_voco)
     ds=MaskFeaturesDataset(ct_paths,ana_paths,arch=args.arch,transform=transforms)
-    get_features(model,ds,args.arch,args.batch_size,roi,args.save_dir,args.use_s3)
+    get_features(model,ds,args.arch,args.batch_size,roi,args.ctrate_dir,args.use_s3)

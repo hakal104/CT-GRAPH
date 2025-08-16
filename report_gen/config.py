@@ -23,8 +23,7 @@ class ModelConfig:
 class DataConfig:
     
     tokenizer_path: str = '/home/jovyan/ct-repgen-datavol-1/.llama/checkpoints/Llama-2-7b-hf/'
-    ctrate_data_path: str = '/home/jovyan/ct-repgen-datavol-1/dataset/ct-rate/'
-    radgenome_data_path: str = '/home/jovyan/ct-repgen-datavol-1/dataset/radgenome/'
+    ctrate_data_path: str = '/home/jovyan/ct-repgen-datavol-1/datasets/ct-rate/'
     use_s3: bool = True
     
 @dataclass

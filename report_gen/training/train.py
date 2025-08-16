@@ -114,8 +114,8 @@ if __name__ == "__main__":
     #Initialize main model
     model = CTLlamaForCausalLM.from_pretrained(
                     data_args.tokenizer_path,
-                    config = config)    
-    
+                    config = config)
+
     model.tokenizer = tokenizer
     model.resize(tokenizer)
     

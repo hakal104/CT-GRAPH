@@ -189,17 +189,17 @@ def compute_metrics(all_labels, all_preds, loss):
     return results
 
 
-def get_data(mode, ctrate_data_path, radgenome_data_path, use_s3, arch, feat_dims, layer):
+def get_data(mode, c, use_s3, arch, feat_dims, layer):
     """
     Defines the paths for the local and global features. Provides the reports and abnormality labels.
     """
     
     # Filter samlpes based on duplicates of original reports from CT-RATE
-    reports_path = os.path.join(ctrate_data_path, f'{mode}_reports.csv')
+    reports_path = os.path.join(ctrate_dir, f'{mode}_reports.csv')
     ct_rate_df = pd.read_csv(reports_path).drop_duplicates('Findings_EN')
     names = list(ct_rate_df['VolumeName'])     
     
-    region_reports_path = os.path.join(radgenome_data_path, f'{mode}_region_report.csv')
+    region_reports_path = os.path.join(ctrate_dir, f'{mode}_region_reports.csv')
     df_rr=pd.read_csv(region_reports_path)
     radgenome_df=df_rr[df_rr['Anatomy'].isna()].sort_values('Volumename')
     filtered_df = radgenome_df[radgenome_df['Volumename'].isin(names)]
@@ -213,9 +213,9 @@ def get_data(mode, ctrate_data_path, radgenome_data_path, use_s3, arch, feat_dim
 
     # If S3 is not used, features are assumed to be located at following paths: 
     if not use_s3:
-        local_paths = [os.path.join(ctrate_data_path,path) for path in local_paths]
+        local_paths = [os.path.join(ctrate_dir,path) for path in local_paths]
         
-    abnormality_path = os.path.join(ctrate_data_path, f'dataset_multi_abnormality_labels_{mode}_predicted_labels.csv')
+    abnormality_path = os.path.join(ctrate_dir, f'multi_abnormality_labels_{mode}.csv')
     abnormality_df=pd.read_csv(abnormality_path)
     abnormality_df = abnormality_df[abnormality_df['VolumeName'].isin(ct_rate_df['VolumeName'])]
     abnormality_labels = np.column_stack([abnormality_df[col].values for col in abnormality_df.columns if col != 'VolumeName'])
@@ -229,8 +229,7 @@ def load_and_split_data(args, feat_dims):
     # train set
     train_local_paths, train_labels = get_data(
         mode='train',
-        ctrate_data_path=args.ctrate_data_path,
-        radgenome_data_path=args.radgenome_data_path,
+        ctrate_dir=args.ctrate_dir,
         use_s3=args.use_s3,
         arch=args.arch,
         feat_dims=feat_dims,
@@ -246,8 +245,7 @@ def load_and_split_data(args, feat_dims):
 
     test_local_paths, test_labels = get_data(
         mode='valid',
-        ctrate_data_path=args.ctrate_data_path,
-        radgenome_data_path=args.radgenome_data_path,
+        ctrate_dir=args.ctrate_dir,
         use_s3=args.use_s3,
         arch=args.arch,
         feat_dims=feat_dims,
@@ -336,8 +334,7 @@ def train_and_evaluate(args, model, optimizer, scaler, scheduler, criterion,
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Perform multilabel classification on CT images.")
-    parser.add_argument("--ctrate_data_path", type=str, default='', help="Data directory for the CT-RATE dataset.")
-    parser.add_argument("--radgenome_data_path", type=str, default='', help="Data directory for the Radgenome dataset.")
+    parser.add_argument("--ctrate_dir", type=str, default='', help="Data directory for the CT-RATE dataset.")
     parser.add_argument("--save_dir", type=str, default='', help="Directory path for saving results.")    
     parser.add_argument("--use_s3", type=bool, default=False, help="Whether to use S3 storage.")
     parser.add_argument("--lr", type=float, default=0.0001, help="Learning rate for the optimizer.")

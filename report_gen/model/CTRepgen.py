@@ -50,6 +50,7 @@ class CTLlamaForCausalLM(LlamaForCausalLM):
         self.lm_head = nn.Linear(config.llama_dim, config.vocab_size, bias=False)
         self.config = config
         self.post_init()
+
         
     def resize(self, tokenizer):
         """Resize token embeddings to match tokenizer vocabulary."""

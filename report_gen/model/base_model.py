@@ -15,6 +15,7 @@ class CTBaseModel(LlamaModel):
             config: Model configuration.
                 Must include the mode, which is the key for selecting a variant class from VARIANT_REGISTRY.
         """
+        
         super().__init__(config)
         self.config = config
         variant_cls = VARIANT_REGISTRY[config.mode]
@@ -25,12 +26,14 @@ class CTBaseModel(LlamaModel):
         Fuse and project local and global features via the selected variant.
 
         Args:
-            local_features (torch.Tensor): Features of shape [B, N, D_local].
-            global_features (torch.Tensor): Features of shape [B, D_global].
+            local_features (torch.Tensor): shape [B, N, D_local] — batch of N local feature vectors
+            global_features (torch.Tensor): shape [B, D_global, H, W, D] — batch of global feature maps
+            with spatial dims (H, W, D)
 
         Returns:
             Projected embeddings for report generation.
         """
+        
         return self.variant.encode_features(local_features, global_features)
 
     def prepare_input_embeddings(
@@ -41,12 +44,14 @@ class CTBaseModel(LlamaModel):
 
         Args:
             input_ids (torch.LongTensor): Token IDs for the textual input.
-            local_features (torch.Tensor): Features of shape [B, N, D_local].
-            global_features (torch.Tensor): Features of shape [B, D_global].
+            local_features (torch.Tensor): shape [B, N, D_local] — batch of N local feature vectors
+            global_features (torch.Tensor): shape [B, D_global, H, W, D] — batch of global feature maps
+            with spatial dims (H, W, D)
 
         Returns:
             inputs_embeds: Tensor of combined visual + text embeddings.
         """
+        
         image_features = self.encode_features(local_features, global_features)
         inputs_embeds = self.embed_tokens(input_ids)
         inputs_embeds = torch.cat(

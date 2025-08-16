@@ -27,7 +27,7 @@ def get_data(mode, model_config, data_args):
     names = list(ct_rate_df['VolumeName'])   
     
     # Take the reports (full text) from Radgenome dataset for actual training/validation 
-    region_reports_path = os.path.join(data_args.radgenome_data_path, f'{mode}_region_report.csv')
+    region_reports_path = os.path.join(data_args.ctrate_data_path, f'{mode}_region_reports.csv')
     df_rr=pd.read_csv(region_reports_path)
     radgenome_df=df_rr[df_rr['Anatomy'].isna()].sort_values('Volumename')
     filtered_df = radgenome_df[radgenome_df['Volumename'].isin(names)]
@@ -47,7 +47,7 @@ def get_data(mode, model_config, data_args):
         global_paths = [os.path.join(data_args.ctrate_data_path,path) for path in global_paths]
         
     if mode == 'valid':
-        abnormality_path = os.path.join(data_args.ctrate_data_path, f'dataset_multi_abnormality_labels_{mode}_predicted_labels.csv')
+        abnormality_path = os.path.join(data_args.ctrate_data_path, f'multi_abnormality_labels_{mode}.csv')
         abnormality_df=pd.read_csv(abnormality_path)
         abnormality_df = abnormality_df[abnormality_df['VolumeName'].isin(ct_rate_df['VolumeName'])]
         abnormality_labels = np.column_stack([abnormality_df[col].values for col in abnormality_df.columns if col != 'VolumeName'])
