@@ -20,16 +20,17 @@ export PYTHONPATH=$(pwd)
 
 We utilize two chest CT datasets:
 
-- **CT-RATE** ([HF dataset](https://huggingface.co/datasets/ibrahimhamamci/CT-RATE)): Large-scale dataset with ~49k training samples. We filter the reports for duplicates using the official CSV (study/report columns), resulting in **~22.7k** train samples. Anatomy masks are generated with **TotalSegmentator**. Data, masks and .csv files are stored in directory &lt;ctrate_dir&gt.
+- **CT-RATE** ([HF dataset](https://huggingface.co/datasets/ibrahimhamamci/CT-RATE)): Large-scale dataset with ~49k training samples. We filter the reports for duplicates using the official CSV (study/report columns), resulting in **~22.7k** train samples. Anatomy masks are generated with **TotalSegmentator**. It includes multi-abnormality labels across 18 pathologies. Data, masks and .csv files are stored in directory &lt;ctrate_dir&gt;.
 - **RadGenome-Chest CT** ([HF dataset](https://huggingface.co/datasets/RadGenome/RadGenome-ChestCT)): Only the reports are utilized from this dataset. We use **full reports** for our main models and **region-level reports** for the Reg2RG baseline. Reports/study IDs come from the dataset’s CSV, which is also stored in <ctrate_dir>.
 
-**Expected paths (train):**
+**Expected training paths (analogous for validation):**
 
 ```bash
 <ctrate_dir>/dataset/train/train_1/train_1_a/train_1_a_1.nii.gz  # CT image
 <ctrate_dir>/dataset/train/train_1/train_1_a/ana_train_1_a_1.nii.gz # anatomy mask
 <ctrate_dir>/train_reports.csv # reports from CT-RATE
 <ctrate_dir>/train_region_reports.csv #reports from RadGenome-Chest CT
+<ctrate_dir>/multi_abnormality_labels_train.csv'
 ```
 
 ---
