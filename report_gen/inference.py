@@ -59,7 +59,7 @@ def load_model(weights_dir, config, data_args):
     model.lm_head.load_state_dict(torch.load(os.path.join(weights_dir, 'lm_head.pt')))
 
     for module_name, module in model.model.variant.get_modules().items():
-        state_path = os.path.join(weights_dir,module_name)
+        state_path = os.path.join(weights_dir,module_name+'.pt')
         if not os.path.exists(state_path):
             raise FileNotFoundError(f"Expected weight file not found: {state_path}")
         state_dict = torch.load(state_path)
