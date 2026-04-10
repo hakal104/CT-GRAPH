@@ -88,6 +88,14 @@ python report_gen/evaluation/evaluation.py --model_path <model_path> --ce_model_
 
 ---
 
+## Checkpoint
+
+We provide the checkpoint of the CT-GRAPH model from Table 4 of the paper. Use the path to the following checkpoint folder as --model_path when running inference.py :
+
+https://drive.google.com/file/d/1VvkJdg6lkC_H2-51zVIiVqDQ6NcCKnSW/view?usp=sharing
+
+---
+
 ## Citation
 
 If you find our work useful, please consider citing:
